@@ -1,0 +1,43 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${workspaceFolder}/.vscode/browse.vc.db",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/yjw/August/mono_followingv2_ws/devel/include/**",
+        "/home/yjw/May/leg_ws/devel/include/**",
+        "/home/yjw/May/fusion_ws/devel/include/**",
+        "/home/yjw/ROS/ee346_ws/devel/include/**",
+        "/home/yjw/mono_following/my_mono_foll_ws/devel/include/**",
+        "/opt/ros/melodic/include/**",
+        "/home/yjw/mono_following/my_mono_foll_ws/src/ccf_person_identification/include/**",
+        "/home/yjw/May/leg_ws/src/leg_tracker/include/**",
+        "/home/yjw/ROS/ee346_ws/src/line_follower_turtlebot/include/**",
+        "/home/yjw/August/mono_followingv2_ws/src/mono_following/include/**",
+        "/home/yjw/August/mono_followingv2_ws/src/mono_tracking/include/**",
+        "/home/yjw/mono_following/my_mono_foll_ws/src/monocular_person_following/include/**",
+        "/home/yjw/August/mono_followingv2_ws/src/pose_estimator/include/**",
+        "/home/yjw/May/fusion_ws/src/LCPF/detection/rgb_detectors/ground_hog/rwth_ground_hog/include/**",
+        "/home/yjw/May/fusion_ws/src/LCPF/utils/rwth_ground_plane/include/**",
+        "/home/yjw/May/fusion_ws/src/LCPF/utils/spencer_diagnostics/include/**",
+        "/home/yjw/May/fusion_ws/src/LCPF/detection/laser_detectors/srl_laser_detectors/include/**",
+        "/home/yjw/May/fusion_ws/src/LCPF/detection/laser_detectors/srl_laser_features/include/**",
+        "/home/yjw/May/fusion_ws/src/LCPF/detection/laser_detectors/srl_laser_segmentation/include/**",
+        "/home/yjw/May/fusion_ws/src/LCPF/tracking/people/srl_nearest_neighbor_tracker/include/**",
+        "/home/yjw/ROS/ee346_ws/src/turtlebot3_simulations/turtlebot3_fake/include/**",
+        "/home/yjw/ROS/ee346_ws/src/turtlebot3_simulations/turtlebot3_gazebo/include/**",
+        "/home/yjw/ROS/ee346_ws/src/turtlebot3/turtlebot3_slam/include/**",
+        "/home/yjw/May/fusion_ws/src/LCPF/identification/vision_identifier/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}
