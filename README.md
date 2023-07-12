@@ -53,11 +53,13 @@ roslaunch mono_tracking evaluate_MPF_in_icvs.launch scene:=corridor_corners
 ```
 ## Citation
 ```
-@article{ye2023robot,
+@inproceedings{ye2023robot,
   title={Robot Person Following Under Partial Occlusion},
   author={Ye, Hanjing and Zhao, Jieting and Pan, Yaling and Chen, Weinan and He, Li and Zhang, Hong},
-  journal={arXiv preprint arXiv:2302.02121},
-  year={2023}
+  booktitle={2023 IEEE International Conference on Robotics and Automation (ICRA)},
+  pages={7591--7597},
+  year={2023},
+  organization={IEEE}
 }
 ```
 
