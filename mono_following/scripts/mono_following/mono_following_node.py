@@ -1,5 +1,6 @@
 #! /usr/bin/env python3
 import numpy as np
+import torch
 import ros_numpy
 import cv2
 from tqdm import main
@@ -7,7 +8,7 @@ import rospy
 import os.path as osp
 
 # My class
-from tracklet import Tracklet
+from track_center.part_tracklet import PartTracklet
 from states.initial_state import InitialState
 from descriminator import Descriminator
 # standard ROS message
@@ -23,11 +24,28 @@ import message_filters
 # from mono_following.msg import Box
 
 from sensor_msgs.msg import Joy
-
+from .utils import AverageMeter, maybe_cuda, mini_batch_deep_part_features
 
 class MonoFollowing:
     def __init__(self):
-        ### Some parameters for debug and testing ###
+        self._init_identifier()
+
+        self._init_subscriber()
+
+        self._init_publisher()
+
+        ### Node is already set up ###
+        rospy.loginfo("Mono Following Node is Ready!")
+        rospy.spin()
+    
+    def _init_identifier(self):
+        ### Our parameters ###
+        self.state = InitialState()
+        self.identifier = Descriminator()
+
+        
+    
+    def _init_subscriber(self):
         self.evaluate = rospy.get_param("~evaluate")
         if self.evaluate:
             self.STORE_DIR = rospy.get_param("~track_store_dir")
@@ -35,14 +53,6 @@ class MonoFollowing:
             print("Store result to: {}".format(self.result_fname))
             self.result_fp = open(self.result_fname, "w")
             self.num = 0
-
-        ### Our parameters ###
-        self.state = InitialState()
-        self.descriminator = Descriminator()
-
-        ### Our necessary topics ###
-        # listen to the transform tree
-        # self.tf_listener = tf.TransformListener()
 
         # subscribe joystick to dynamically choose the target
         self.reselect_target = False
@@ -52,29 +62,24 @@ class MonoFollowing:
         self.imageSubscriber = message_filters.Subscriber(imageTopic, Image)
         trackedPersonsTopic = "/mono_tracking/tracks"
         self.tracks_sub = message_filters.Subscriber(trackedPersonsTopic, TrackedPersons)
-        tss = message_filters.ApproximateTimeSynchronizer([self.tracks_sub, self.imageSubscriber], queue_size=20, slop=0.8)
-        tss.registerCallback(self.callback)
-
+        self.tss = message_filters.ApproximateTimeSynchronizer([self.tracks_sub, self.imageSubscriber], queue_size=20, slop=0.8)
+        self.tss.registerCallback(self.callback)
+    
+    def _init_publisher(self):
         # publish image for visualization
         self.image_pub = rospy.Publisher("/mono_following/vis_image", Image, queue_size=1)
         # publish image patches for visualization
         self.patches_pub = rospy.Publisher("/mono_following/patches", Image, queue_size=1)
         # publish target information
         self.target_pub = rospy.Publisher("/mono_following/target", TargetPerson, queue_size=1)
-
-    
-
-        ### Node is already set up ###
-        rospy.loginfo("Mono Following Node is Ready!")
-        rospy.spin()
     
     def callback(self, tracks_msg, image_msg):
         # print("CALLBACK")
         # get messages
         if self.reselect_target:
-            self.init_model()
-            self.reselect_target = False
-
+            self._re_init_model()
+            
+        ### Create tracklets ###
         self.tracks = {}
         if image_msg.encoding == "rgb8":
             image = ros_numpy.numpify(image_msg)
@@ -84,18 +89,18 @@ class MonoFollowing:
         for track in tracks_msg.tracks:
             if track.pose.pose.position.x == 0 or track.is_matched == False:
                 continue
-            self.tracks[track.track_id] = Tracklet(tracks_msg.header, track, image)
+            self.tracks[track.track_id] = PartTracklet(self.params, track, image)
 
-        # extract features
+        # Extract Features ###
         self.descriminator.extractFeatures(self.tracks)
         
-        # update the state
+        ### Update States ###
         # print(self.state.state_name())
         next_state = self.state.update(self.descriminator, self.tracks)
         if next_state is not self.state:
             self.state = next_state
         
-        # publish target information
+        ### Publish Target Information ###
         target = TargetPerson()
         target.header = tracks_msg.header
         target_id = self.state.target()
@@ -175,9 +180,29 @@ class MonoFollowing:
             print("\nRe-init target\n")
             self.reselect_target = True
     
-    def init_model(self):
+    def _re_init_model(self):
         self.state = InitialState()
         self.descriminator = Descriminator()
+        self.reselect_target = False
+    
+    def extract_features(self, model, tracklets: dict):
+        idx = list(tracklets.keys())[0]
+        img_size = tracklets[idx].image_patch.size()
+        vis_map_size = tracklets[idx].visibility_map.size()
+        img_patches = torch.empty((len(tracklets.keys()), *img_size[1:]), dtype=torch.float32)
+        vis_maps = torch.empty((len(tracklets.keys()), *vis_map_size), dtype=torch.float32)
+        for i, idx in enumerate(sorted(tracklets.keys())):
+            img_patches[i, :] = tracklets[idx].image_patch
+            vis_maps[i, :] = tracklets[idx].visibility_map
+
+        # compute deep features with mini-batches
+        num = len(tracklets.keys())
+        total_x = maybe_cuda(img_patches)
+        total_vis_map = maybe_cuda(vis_maps)
+        deep_features_, att_maps_ = mini_batch_deep_part_features(model, total_x, num, total_vis_map, True)
+        for i, idx in enumerate(sorted(tracklets.keys())):
+            tracklets[idx].deep_feature = deep_features_[i]  # (5,512)
+            tracklets[idx].att_map = att_maps_[i]  # (8,4)
 
 if __name__ == "__main__":
     rospy.init_node('mono_following', anonymous=True)
