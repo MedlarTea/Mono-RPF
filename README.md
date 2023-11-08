@@ -28,7 +28,7 @@ python setup.py install
 - Eigen==3.0+
 
 ## Download pre-trained weights
-1. Download bounding-box detection models: [yolox-s](https://megvii-my.sharepoint.cn/:u:/g/personal/gezheng_megvii_com/EW62gmO2vnNNs5npxjzunVwB9p307qqygaCkXdTO88BLUg?e=NMTQYw) and [yolox-m](https://megvii-my.sharepoint.cn/:u:/g/personal/gezheng_megvii_com/ERMTP7VFqrVBrXKMU7Vl4TcBQs0SUeCT7kvc-JdIbej4tQ?e=1MDo9y), then make director `mono_tracking/scripts/AlphaPose/YOLOX/weights` and put the checkpoints to it.
+1. Download bounding-box detection models from [Google Drive](https://drive.google.com/drive/folders/1a-z4zPpZX6XVwtklhTybydMcgH9JqZKR?usp=drive_link) or [YOLOX_deepsort_tracker], then make director `mono_tracking/scripts/AlphaPose/YOLOX/weights` and put the checkpoints to it.
 2. Download 2d joint detection models: [Google drive](https://drive.google.com/drive/folders/1v-2Noym5U13BG6Zwj9EoqYRn6GXimh6p?usp=sharing), then make directory `mono_tracking/scripts/AlphaPose/Models` and put the checkpoints to it.
 
 ## How to use
