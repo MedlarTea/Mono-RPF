@@ -31,9 +31,18 @@ class RRClassifier:
         for i in range(len(labels)):
             # score_pos_st = score_neg_st = 0.0
             if labels[i] == 1:
+                # if self.clf !=None:
+                #     score_pos_st=self.predict(features[i][0])
+                #     if score_pos_st < 0.7:
+                #         continue
                 self.posTrainSet.append(features[i][0])
                 self.posLabels.append(1)
             else:
+                # if self.clf !=None:
+                #     score_neg_st=self.predict(features[i][0])
+                #     if score_neg_st > 0.7:
+                #         continue
+                # print("NEG: {}".format(labels[i])) 
                 self.negTrainSet.append(features[i][0])
                 self.negLabels.append(0)
 
@@ -163,6 +172,14 @@ class RRClassifierWithStrategy(RRClassifier):
     # def update_cache_with_dist(feature, dist):
         
     def update_cache(self, features, labels):
+        # print("[Frame {}]".format(self.nummm))
+        # print("pos long-term : {}".format(len(self.posTrainSet_lt)))
+        # print("neg long-term : {}".format(len(self.negTrainSet_lt)))
+        # print("pos short-term: {}".format(len(self.posTrainSet_st)))
+        # print("neg short-term: {}".format(len(self.negTrainSet_st)))
+        # print("pos set       : {}".format(len(self.posTrainSet)))
+        # print("neg set       : {}".format(len(self.negTrainSet)))
+
         """update our long term feature cache
         Input:
             features: [N, feature], feature = (descriptor, distance, box)
@@ -250,6 +267,8 @@ class RRClassifierWithStrategy(RRClassifier):
     def update_classifier(self):
         trainSet = [x[0] for x in self.posTrainSet] + [x[0] for x in self.negTrainSet]
         labels = self.posLabels + self.negLabels
+        # self.clf = Ridge(alpha=self.alpha, random_state=1)
+        # self.clf = KernelRidge(alpha=1.0)
         self.clf.fit(trainSet, labels)
 
     def predict(self, feature):

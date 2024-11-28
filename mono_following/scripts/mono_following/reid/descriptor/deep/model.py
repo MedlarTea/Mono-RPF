@@ -46,8 +46,6 @@ def make_layers(c_in,c_out,repeat_times, is_downsample=False):
     return nn.Sequential(*blocks)
 
 class Net(nn.Module):
-    """Similar to ResNet18
-    """
     def __init__(self, num_classes=751 ,reid=False):
         super(Net,self).__init__()
         # 3 128 64
@@ -60,17 +58,17 @@ class Net(nn.Module):
             # nn.ReLU(inplace=True),
             nn.MaxPool2d(3,2,padding=1),
         )
-        # 32 64 32
+        # 64 64 32
         self.layer1 = make_layers(64,64,2,False)
-        # 32 64 32
+        # 64 64 32
         self.layer2 = make_layers(64,128,2,True)
-        # 64 32 16
+        # 128 32 16
         self.layer3 = make_layers(128,256,2,True)
-        # 128 16 8
+        # 256 16 8
         self.layer4 = make_layers(256,512,2,True)
-        # 256 8 4
+        # 512 8 4
         self.avgpool = nn.AvgPool2d((8,4),1)
-        # 256 1 1 
+        # 512 1 1 
         self.reid = reid
         self.classifier = nn.Sequential(
             nn.Linear(512, 256),
@@ -87,8 +85,8 @@ class Net(nn.Module):
         x = self.layer3(x)
         x = self.layer4(x)
         x = self.avgpool(x)
-        x = x.view(x.size(0),-1)
-        # B x 128
+        x = x.view(x.size(0),-1)  # (512,1)
+        # B x 512
         if self.reid:
             x = x.div(x.norm(p=2,dim=1,keepdim=True))
             return x

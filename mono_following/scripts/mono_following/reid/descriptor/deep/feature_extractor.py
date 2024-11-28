@@ -71,6 +71,7 @@ class PersonExtractor(Extractor):
             features = self._get_feature(imgs)
         else:
             features = np.array([])
+        print(features.shape)
         return features
 
 

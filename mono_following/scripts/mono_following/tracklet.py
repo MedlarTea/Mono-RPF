@@ -17,6 +17,9 @@ class Tracklet:
         ### transform the point ###
         self.person_poseWithCovariance = track_msg.pose
         self.twist = track_msg.twist
+        # transformed_point = PointStamped()
+        # tf_listener.transformPoint("base_link", person_point, transformed_point)
+        # self.pos_in_baselink = [transformed_point.point.x, transformed_point.point.y]
         self.pos_in_baselink = [self.person_poseWithCovariance.pose.position.x, self.person_poseWithCovariance.pose.position.y, self.person_poseWithCovariance.pose.position.z]
         self.distance = np.linalg.norm(self.pos_in_baselink)
 
